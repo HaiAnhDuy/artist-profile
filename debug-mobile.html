@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Debug Mobile Images</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        background: #000;
+        color: #fff;
+      }
+
+      .test-image {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+        margin: 20px 0;
+        border: 2px solid #9a7b4f;
+      }
+
+      .status {
+        background: #333;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+      }
+
+      .success {
+        background: #4ade80;
+      }
+      .error {
+        background: #ef4444;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Mobile Image Debug Test</h1>
+    <div id="status" class="status">Loading...</div>
+
+    <h2>Test Images:</h2>
+    <img
+      src="images/anh-dai-dien.png"
+      alt="Profile Image"
+      class="test-image"
+      id="img1"
+    />
+    <img
+      src="images/h1.jpg"
+      alt="Gallery Image 1"
+      class="test-image"
+      id="img2"
+    />
+    <img
+      src="images/k1.jpg"
+      alt="Gallery Image 2"
+      class="test-image"
+      id="img3"
+    />
+
+    <script>
+      const statusDiv = document.getElementById("status");
+      const images = document.querySelectorAll(".test-image");
+      let loadedCount = 0;
+
+      function updateStatus() {
+        statusDiv.innerHTML = `Loaded: ${loadedCount}/${images.length} images`;
+        statusDiv.className =
+          loadedCount === images.length ? "status success" : "status";
+      }
+
+      images.forEach((img, index) => {
+        img.addEventListener("load", () => {
+          loadedCount++;
+          console.log(`Image ${index + 1} loaded successfully`);
+          updateStatus();
+        });
+
+        img.addEventListener("error", () => {
+          console.error(`Image ${index + 1} failed to load`);
+          statusDiv.innerHTML += `<br>Error loading image ${index + 1}`;
+          statusDiv.className = "status error";
+        });
+      });
+
+      // Check if images are already loaded
+      setTimeout(() => {
+        images.forEach((img, index) => {
+          if (img.complete && img.naturalHeight !== 0) {
+            loadedCount++;
+            console.log(`Image ${index + 1} was already loaded`);
+          }
+        });
+        updateStatus();
+      }, 100);
+
+      // Mobile device info
+      console.log("Screen width:", window.innerWidth);
+      console.log("User agent:", navigator.userAgent);
+      console.log("Is mobile:", window.innerWidth <= 768);
+    </script>
+  </body>
+</html>

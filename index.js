@@ -563,7 +563,8 @@ function initMobileEnhancements() {
     // Add mobile-specific classes and behaviors
     addScrollRevealAnimations();
     addTouchRippleEffects();
-    addProgressiveImageLoading();
+    // Temporarily disable progressive loading to fix image disappearing issue
+    // addProgressiveImageLoading();
     addMobileParallax();
   }
 
@@ -610,7 +611,7 @@ function addScrollRevealAnimations() {
 
   // Observe elements for animation
   const elementsToAnimate = document.querySelectorAll(
-    ".gallery-item, .manifesto-block, .painting-large, .painting-small, .sketch-item, .section-title"
+    ".gallery-item:not(img), .manifesto-block, .painting-large:not(img), .painting-small:not(img), .sketch-item:not(img), .section-title"
   );
 
   elementsToAnimate.forEach((el) => {
@@ -638,12 +639,31 @@ function addProgressiveImageLoading() {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         const img = entry.target;
-        img.style.opacity = "0";
-        img.style.transition = "opacity 0.6s ease";
 
-        img.onload = () => {
+        // Check if image is already loaded
+        if (img.complete && img.naturalHeight !== 0) {
+          // Image is already loaded, show it immediately
           img.style.opacity = "1";
-        };
+          img.style.transition = "opacity 0.3s ease";
+        } else {
+          // Image not loaded yet, set up loading animation
+          img.style.opacity = "0";
+          img.style.transition = "opacity 0.6s ease";
+
+          const handleLoad = () => {
+            img.style.opacity = "1";
+            img.removeEventListener("load", handleLoad);
+          };
+
+          img.addEventListener("load", handleLoad);
+
+          // Fallback: show image after 2 seconds regardless
+          setTimeout(() => {
+            if (img.style.opacity === "0") {
+              img.style.opacity = "1";
+            }
+          }, 2000);
+        }
 
         imageObserver.unobserve(img);
       }

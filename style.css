@@ -1160,6 +1160,12 @@ html {
   height: 300px;
 }
 
+/* Ensure images are always visible */
+img {
+  opacity: 1 !important;
+  transition: none !important;
+}
+
 /* Mobile Scroll Reveal Animations */
 @keyframes slideInUp {
   from {
@@ -1205,7 +1211,7 @@ html {
   }
 }
 
-.animate-on-scroll {
+.animate-on-scroll:not(img) {
   opacity: 0;
   transition: all 0.6s ease;
 }
