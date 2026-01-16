@@ -24,4 +24,4 @@ build/
 npm-debug.log*
 
 # Sensitive
-config.js
+# config.js
