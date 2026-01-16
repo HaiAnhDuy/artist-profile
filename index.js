@@ -514,8 +514,20 @@ function initMobileNavigation() {
     // Close mobile nav when clicking on links
     mobileNavLinks.forEach((link) => {
       link.addEventListener("click", function (e) {
+        const href = this.getAttribute("href");
+        
+        // Check if it's an external link (not starting with #)
+        if (!href.startsWith("#")) {
+          // Allow external navigation without preventing default
+          // Close mobile nav
+          mobileToggle.classList.remove("active");
+          mobileNav.classList.remove("active");
+          document.body.style.overflow = "";
+          return; // Let the browser handle navigation
+        }
+        
         e.preventDefault();
-        const targetId = this.getAttribute("href").substring(1);
+        const targetId = href.substring(1);
         const targetElement = document.getElementById(targetId);
 
         // Close mobile nav

@@ -1,0 +1,300 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="login.css" />
+
+<button id="btnOpenAdmin" style="display: none;">⚙️ Hành Động</button>
+<div id="modal-overlay" style="display: none;"></div>
+
+<div id="login-form">
+    <h3>Đăng nhập Admin</h3>
+    <input type="email" id="email" placeholder="Email admin">
+    <input type="password" id="password" placeholder="Mật khẩu">
+    <button id="btnLogin">Đăng nhập</button>
+</div>
+
+<div id="admin-panel" style="display: none; border: 1px solid #ccc; padding: 30px; margin: 10px 0;">
+    <button id="btnCloseModal" style="float: right; background: transparent; border: none; color: #999; font-size: 28px; cursor: pointer; padding: 0; line-height: 1;">×</button>
+    <h3>Quản lý ảnh</h3>
+    
+    <div id="imagePreviewContainer" style="margin-bottom: 15px; display: none; text-align: center;">
+        <img id="imagePreview" src="" alt="Preview" style="max-width: 100%; max-height: 300px; border-radius: 6px; border: 1px solid #444;">
+    </div>
+    
+    <input type="file" id="fileInput" accept="image/*">
+    <input type="text" id="imgCaption" placeholder="Mô tả ảnh (Caption)" maxlength="255">
+    <div id="captionCounter" style="text-align: right; font-size: 12px; color: #999; margin-bottom: 10px; margin-top: -8px;">0/255</div>
+    <button id="btnUpload">Upload Ảnh</button>
+    <p id="uploadStatus"></p>
+    <button id="btnLogout" style="background: red; color: white;">Đăng xuất</button>
+</div>
+
+<h2 id="gallery-title" style="text-align: center; margin-top: 40px;">Quản Lý Ảnh</h2>
+<div id="gallery" style="display: flex; flex-wrap: wrap; gap: 10px;">
+    </div>
+<div id="loading-indicator" style="text-align: center; padding: 30px; color: #888; font-size: 16px; display: none;">
+  <p>Đang loading...</p>
+</div>
+
+
+<script type="module">
+  import { firebaseConfig, CLOUD_NAME, UPLOAD_PRESET } from './config.js';
+  
+  // 1. Chỉ import Auth và Firestore (Bỏ Storage)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } 
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc } 
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // 2. Cấu hình Firebase - được import từ config.js
+  // const firebaseConfig = { ... } được định nghĩa ở config.js
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // --- CẤU HÌNH CLOUDINARY ---
+  // const CLOUD_NAME và UPLOAD_PRESET được import từ config.js
+
+  // --- LOGIC AUTH (GIỮ NGUYÊN) ---
+  const loginForm = document.getElementById('login-form');
+  const adminPanel = document.getElementById('admin-panel');
+  const btnOpenAdmin = document.getElementById('btnOpenAdmin');
+  const btnCloseModal = document.getElementById('btnCloseModal');
+  const modalOverlay = document.getElementById('modal-overlay');
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      loginForm.style.display = 'none';
+      btnOpenAdmin.style.display = 'block';
+    } else {
+      loginForm.style.display = 'block';
+      btnOpenAdmin.style.display = 'none';
+      adminPanel.style.display = 'none';
+      modalOverlay.style.display = 'none';
+    }
+  });
+
+  // Mở modal
+  btnOpenAdmin.addEventListener('click', () => {
+    adminPanel.style.display = 'block';
+    modalOverlay.style.display = 'block';
+  });
+
+  // Đóng modal
+  function closeModal() {
+    adminPanel.style.display = 'none';
+    modalOverlay.style.display = 'none';
+  }
+  btnCloseModal.addEventListener('click', closeModal);
+  modalOverlay.addEventListener('click', closeModal);
+
+  document.getElementById('btnLogin').addEventListener('click', async () => {
+    const email = document.getElementById('email').value;
+    const pass = document.getElementById('password').value;
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+      alert("Login OK!");
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+
+  document.getElementById('btnLogout').addEventListener('click', () => signOut(auth));
+
+  // --- LOGIC FILE PREVIEW ---
+  document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const preview = document.getElementById('imagePreview');
+        const container = document.getElementById('imagePreviewContainer');
+        preview.src = event.target.result;
+        container.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // --- LOGIC CAPTION CHARACTER COUNTER ---
+  document.getElementById('imgCaption').addEventListener('input', function(e) {
+    const counter = document.getElementById('captionCounter');
+    const length = e.target.value.length;
+    counter.innerText = length + '/255';
+    
+    // Đổi màu khi gần tới giới hạn
+    if (length > 200) {
+      counter.style.color = '#ff9999';
+    } else if (length > 150) {
+      counter.style.color = '#ffcc99';
+    } else {
+      counter.style.color = '#999';
+    }
+  });
+  // --- LOGIC UPLOAD MỚI (DÙNG CLOUDINARY) ---
+
+  document.getElementById('btnUpload').addEventListener('click', async () => {
+    const file = document.getElementById('fileInput').files[0];
+    const caption = document.getElementById('imgCaption').value;
+    const status = document.getElementById('uploadStatus');
+
+    if (!file) return alert("Chưa chọn file!");
+
+    status.innerText = "Đang đẩy lên Cloudinary...";
+
+    try {
+      // BƯỚC A: Upload lên Cloudinary dùng Fetch API
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', UPLOAD_PRESET);
+
+      // Gửi request POST
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) throw new Error("Lỗi Cloudinary: " + data.error.message);
+
+      // Lấy link ảnh từ kết quả trả về
+      const imageUrl = data.secure_url; 
+      
+      // BƯỚC B: Lưu link vào Firebase Firestore
+      status.innerText = "Đang lưu vào Database...";
+      
+      await addDoc(collection(db, "portfolio_images"), {
+        imageUrl: imageUrl,
+        caption: caption,
+        createdAt: Date.now()
+      });
+
+      status.innerText = "Thành công!";
+      document.getElementById('fileInput').value = "";
+      document.getElementById('imgCaption').value = "";
+
+    } catch (error) {
+      console.error(error);
+      status.innerText = "Lỗi: " + error.message;
+    }
+  });
+
+  // --- LOGIC HIỂN THỊ ẢNH VỚI INFINITE SCROLL ---
+  let allImages = []; // Lưu tất cả ảnh từ DB
+  let displayedCount = 5; // Ban đầu hiển thị 5 ảnh
+  const ITEMS_PER_LOAD = 5; // Mỗi lần scroll tải 5 ảnh
+  let isLoading = false;
+
+  // Lấy tất cả ảnh từ Firestore
+  const q = query(collection(db, "portfolio_images"), orderBy("createdAt", "desc"));
+  
+  onSnapshot(q, (snapshot) => {
+    allImages = [];
+    snapshot.forEach((docSnap) => {
+      allImages.push({
+        id: docSnap.id,
+        data: docSnap.data()
+      });
+    });
+    
+    // Reset và hiển thị lại
+    displayedCount = 5;
+    renderGallery();
+  });
+
+  // Hàm render gallery
+  function renderGallery() {
+    const gallery = document.getElementById('gallery');
+    
+    if (allImages.length === 0) {
+      gallery.innerHTML = "<p style='width: 100%; text-align: center; color: #888; font-size: 16px; padding: 40px;'>Không có ảnh</p>";
+      return;
+    }
+
+    // Nếu là lần đầu, xóa gallery
+    if (displayedCount === 5 || displayedCount - ITEMS_PER_LOAD === 0) {
+      gallery.innerHTML = "";
+    }
+
+    // Lấy ảnh từ vị trí cũ tới vị trí mới
+    const imagesToDisplay = allImages.slice(0, displayedCount);
+    
+    // Nếu lần đầu, render tất cả; nếu scroll, thêm vào
+    if (displayedCount === 5) {
+      gallery.innerHTML = "";
+      imagesToDisplay.forEach(item => {
+        const { id, data } = item;
+        const div = document.createElement('div');
+        div.innerHTML = `
+          <img src="${data.imageUrl}" style="width: 200px;">
+          <p>${data.caption}</p>
+          <button class="btn-delete" data-id="${id}" style="background:red; color:white;">Xoá</button>
+        `;
+        gallery.appendChild(div);
+      });
+    } else {
+      // Thêm ảnh mới vào cuối
+      const newImages = allImages.slice(displayedCount - ITEMS_PER_LOAD, displayedCount);
+      newImages.forEach(item => {
+        const { id, data } = item;
+        const div = document.createElement('div');
+        div.innerHTML = `
+          <img src="${data.imageUrl}" style="width: 200px;">
+          <p>${data.caption}</p>
+          <button class="btn-delete" data-id="${id}" style="background:red; color:white;">Xoá</button>
+        `;
+        gallery.appendChild(div);
+      });
+    }
+
+    // Gán sự kiện cho nút delete
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+      btn.addEventListener('click', handleDelete);
+    });
+
+    isLoading = false;
+  }
+
+  // Phát hiện scroll để tải thêm ảnh
+  window.addEventListener('scroll', () => {
+    // Nếu đang tải hoặc đã hiển thị hết ảnh, dừng
+    if (isLoading || displayedCount >= allImages.length) return;
+
+    // Kiểm tra nếu user scroll gần tới dưới cùng
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+      isLoading = true;
+      displayedCount += ITEMS_PER_LOAD;
+      
+      // Hiển thị loading indicator
+      document.getElementById('loading-indicator').style.display = 'block';
+      
+      // Delay nhỏ để tránh quá nhanh
+      setTimeout(() => {
+        renderGallery();
+        // Ẩn loading indicator
+        document.getElementById('loading-indicator').style.display = 'none';
+      }, 300);
+    }
+  });
+
+  // --- LOGIC XOÁ (LƯU Ý NHỎ) ---
+  async function handleDelete(e) {
+    if (!auth.currentUser) return alert("Cần đăng nhập!");
+    if(!confirm("Xoá ảnh này?")) return;
+
+    const docId = e.target.getAttribute('data-id');
+
+    try {
+      // Lưu ý: Với cách này, ta chỉ xoá dữ liệu trong Database để nó mất khỏi web.
+      // Ảnh trên Cloudinary vẫn còn (để xoá ảnh trên Cloudinary từ Client cần cấu hình bảo mật phức tạp hơn).
+      // Nhưng với web cá nhân thì kệ nó, Cloudinary cho free nhiều dung lượng lắm.
+      
+      await deleteDoc(doc(db, "portfolio_images", docId));
+      alert("Đã xoá hiển thị!");
+    } catch (error) {
+      alert("Lỗi: " + error.message);
+    }
+  }
+</script>

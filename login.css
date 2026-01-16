@@ -1,0 +1,789 @@
+/* ===== GENERAL STYLES ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+  color: #e0e0e0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+}
+
+/* ===== LOGIN FORM STYLES ===== */
+#login-form {
+  max-width: 400px;
+  margin: 60px auto;
+  padding: 40px;
+  background: rgba(20, 20, 20, 0.8);
+  border: 2px solid #333;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  animation: slideIn 0.6s ease-out;
+}
+
+#login-form h3 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 30px;
+  background: linear-gradient(135deg, #ffffff 0%, #b0b0b0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+#login-form input {
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  background: rgba(40, 40, 40, 0.9);
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #e0e0e0;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+#login-form input::placeholder {
+  color: #888;
+}
+
+#login-form input:focus {
+  outline: none;
+  border-color: #999;
+  background: rgba(50, 50, 50, 0.9);
+  box-shadow: 0 0 10px rgba(200, 200, 200, 0.2);
+}
+
+#btnLogin {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #333 0%, #555 100%);
+  border: 1px solid #666;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+#btnLogin:hover {
+  background: linear-gradient(135deg, #444 0%, #666 100%);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+#btnLogin:active {
+  transform: translateY(0);
+}
+
+/* ===== BUTTON OPEN ADMIN ===== */
+#btnOpenAdmin {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #4a7c59 0%, #6b9f7f 100%);
+  border: 1px solid #5a8c69;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#btnOpenAdmin:hover {
+  background: linear-gradient(135deg, #5a8c69 0%, #7baf8f 100%);
+  box-shadow: 0 6px 20px rgba(107, 159, 127, 0.5);
+  transform: translateY(-2px);
+}
+
+#btnOpenAdmin:active {
+  transform: translateY(0);
+}
+
+/* ===== MODAL OVERLAY ===== */
+#modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ===== ADMIN PANEL AS MODAL ===== */
+#admin-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 500px;
+  width: 90%;
+  padding: 40px;
+  background: rgba(20, 20, 20, 0.95) !important;
+  border: 2px solid #444 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  z-index: 1001;
+  animation: modalSlideIn 0.4s ease-out;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -40%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+#btnCloseModal {
+  float: right !important;
+  background: transparent !important;
+  border: none !important;
+  color: #999 !important;
+  font-size: 32px !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  transition: all 0.3s ease;
+  margin-top: -10px;
+  margin-right: -10px;
+}
+
+#btnCloseModal:hover {
+  color: #fff !important;
+  transform: rotate(90deg);
+}
+
+#admin-panel h3 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 25px !important;
+  background: linear-gradient(135deg, #ffffff 0%, #b0b0b0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 1px;
+}
+
+/* ===== IMAGE PREVIEW ===== */
+#imagePreviewContainer {
+  margin-bottom: 15px;
+  display: none;
+  text-align: center;
+  padding: 15px;
+  background: rgba(40, 40, 40, 0.5);
+  border: 1px solid #444;
+  border-radius: 8px;
+  animation: fadeIn 0.3s ease;
+}
+
+#imagePreview {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 6px;
+  border: 2px solid #555;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  display: block;
+  margin: 0 auto;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+#admin-panel h3 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 25px !important;
+  background: linear-gradient(135deg, #ffffff 0%, #b0b0b0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 1px;
+}
+
+#admin-panel input[type="file"],
+#admin-panel input[type="text"] {
+  width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  background: rgba(40, 40, 40, 0.9);
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #e0e0e0;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+#admin-panel input[type="file"]::file-selector-button {
+  background: rgba(60, 60, 60, 0.9);
+  border: 1px solid #555;
+  border-radius: 4px;
+  padding: 8px 16px;
+  color: #e0e0e0;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: all 0.3s ease;
+}
+
+#admin-panel input[type="file"]::file-selector-button:hover {
+  background: rgba(80, 80, 80, 0.9);
+}
+
+#admin-panel input[type="text"]:focus,
+#admin-panel input[type="file"]:focus {
+  outline: none;
+  border-color: #999;
+  background: rgba(50, 50, 50, 0.9);
+  box-shadow: 0 0 10px rgba(200, 200, 200, 0.2);
+}
+
+#btnUpload {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #4a7c59 0%, #6b9f7f 100%);
+  border: 1px solid #5a8c69;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#btnUpload:hover {
+  background: linear-gradient(135deg, #5a8c69 0%, #7baf8f 100%);
+  box-shadow: 0 4px 15px rgba(107, 159, 127, 0.4);
+  transform: translateY(-2px);
+}
+
+#btnUpload:active {
+  transform: translateY(0);
+}
+
+#uploadStatus {
+  padding: 12px;
+  margin-bottom: 14px;
+  background: rgba(60, 60, 60, 0.7);
+  border-left: 3px solid #999;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #b0b0b0;
+  min-height: 20px;
+}
+
+#btnLogout {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #8b3a3a 0%, #b84a4a 100%) !important;
+  border: 1px solid #a84a4a !important;
+  border-radius: 6px !important;
+  color: #fff !important;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#btnLogout:hover {
+  background: linear-gradient(135deg, #9b4a4a 0%, #c85a5a 100%) !important;
+  box-shadow: 0 4px 15px rgba(184, 74, 74, 0.4);
+  transform: translateY(-2px);
+}
+
+#btnLogout:active {
+  transform: translateY(0);
+}
+
+/* ===== GALLERY TITLE ===== */
+#gallery-title {
+  text-align: center;
+  margin-top: 60px !important;
+  margin-bottom: 20px;
+  font-size: 32px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #ffffff 0%, #b0b0b0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* ===== GALLERY STYLES ===== */
+#gallery {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 20px !important;
+  padding: 30px;
+  max-width: 1500px;
+  margin: 40px auto;
+  justify-content: flex-start;
+}
+
+#gallery > div {
+  background: rgba(30, 30, 30, 0.95);
+  border: 1px solid #444;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+#gallery > div:hover {
+  border-color: #666;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  transform: translateY(-4px);
+}
+
+#gallery img {
+  width: 200px !important;
+  height: 250px !important;
+  object-fit: cover;
+  display: block !important;
+}
+
+#gallery p {
+  padding: 12px;
+  font-size: 13px;
+  color: #c0c0c0;
+  line-height: 1.4;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.btn-delete {
+  width: calc(100% - 10px);
+  margin: 0 5px 8px 5px;
+  padding: 10px;
+  background: linear-gradient(135deg, #8b3a3a 0%, #b84a4a 100%) !important;
+  border: 1px solid #a84a4a !important;
+  border-radius: 4px !important;
+  color: #fff !important;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-delete:hover {
+  background: linear-gradient(135deg, #9b4a4a 0%, #c85a5a 100%) !important;
+  box-shadow: 0 4px 10px rgba(184, 74, 74, 0.4);
+  transform: scale(1.02);
+}
+
+.btn-delete:active {
+  transform: scale(0.98);
+}
+
+/* ===== LOADING INDICATOR ===== */
+#loading-indicator {
+  text-align: center;
+  padding: 30px;
+  color: #888;
+  font-size: 16px;
+  display: none;
+}
+
+#loading-indicator p {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* DESKTOP - 1024px trở lên */
+@media (min-width: 1024px) {
+  body {
+    font-size: 16px;
+  }
+  
+  #gallery {
+    max-width: 1500px;
+  }
+}
+
+/* TABLET - 768px đến 1023px */
+@media (max-width: 1023px) and (min-width: 768px) {
+  body {
+    font-size: 15px;
+  }
+
+  #login-form {
+    max-width: 90%;
+    margin: 50px auto;
+    padding: 30px;
+  }
+
+  #login-form h3 {
+    font-size: 24px;
+    margin-bottom: 25px;
+  }
+
+  #login-form input,
+  #btnLogin {
+    padding: 12px 14px;
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+
+  #admin-panel {
+    max-width: 450px;
+    width: 90%;
+    padding: 30px;
+  }
+
+  #admin-panel h3 {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  #admin-panel input,
+  #btnUpload,
+  #btnLogout {
+    padding: 11px 14px;
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+
+  #gallery {
+    max-width: 1000px;
+    padding: 20px;
+    gap: 15px;
+  }
+
+  #gallery > div {
+    flex: 0 1 calc(50% - 8px);
+  }
+
+  #gallery img {
+    width: 100% !important;
+    height: 240px !important;
+  }
+
+  #btnOpenAdmin {
+    padding: 12px 18px;
+    font-size: 13px;
+    top: 15px;
+    right: 15px;
+  }
+
+  #gallery-title {
+    font-size: 28px;
+    margin-top: 40px;
+    margin-bottom: 15px;
+  }
+}
+
+/* MOBILE - dưới 768px */
+@media (max-width: 767px) {
+  body {
+    font-size: 14px;
+  }
+
+  /* ===== LOGIN FORM ON MOBILE ===== */
+  #login-form {
+    max-width: 100%;
+    margin: 40px 15px;
+    padding: 25px;
+    border-radius: 10px;
+  }
+
+  #login-form h3 {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  #login-form input {
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    font-size: 16px;
+    border-radius: 6px;
+  }
+
+  #btnLogin {
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  /* ===== MODAL ON MOBILE ===== */
+  #admin-panel {
+    max-width: 95%;
+    width: 95%;
+    padding: 25px;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 10px;
+  }
+
+  #admin-panel h3 {
+    font-size: 18px;
+    margin-bottom: 18px;
+  }
+
+  #btnCloseModal {
+    font-size: 28px !important;
+    margin-top: -8px;
+    margin-right: -8px;
+  }
+
+  #admin-panel input[type="file"],
+  #admin-panel input[type="text"] {
+    padding: 11px 12px;
+    margin-bottom: 12px;
+    font-size: 16px;
+    border-radius: 5px;
+  }
+
+  #admin-panel input[type="file"]::file-selector-button {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+
+  #btnUpload {
+    padding: 11px;
+    font-size: 13px;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  #uploadStatus {
+    padding: 10px;
+    margin-bottom: 12px;
+    font-size: 12px;
+    border-radius: 3px;
+  }
+
+  #btnLogout {
+    padding: 11px !important;
+    font-size: 13px !important;
+    font-weight: 600;
+  }
+
+  /* ===== GALLERY ON MOBILE ===== */
+  #gallery-title {
+    font-size: 24px;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    padding: 0 15px;
+  }
+
+  #gallery {
+    max-width: 100%;
+    padding: 12px;
+    gap: 12px;
+    margin: 20px auto;
+    justify-content: flex-start;
+  }
+
+  #gallery > div {
+    flex: 0 1 calc(50% - 6px);
+    border-radius: 6px;
+  }
+
+  #gallery img {
+    width: 100% !important;
+    height: 180px !important;
+  }
+
+  #gallery p {
+    padding: 10px;
+    font-size: 12px;
+    min-height: 35px;
+  }
+
+  .btn-delete {
+    width: calc(100% - 8px) !important;
+    margin: 0 4px 6px 4px !important;
+    padding: 8px !important;
+    font-size: 11px;
+  }
+
+  /* ===== BUTTON OPEN ADMIN ON MOBILE ===== */
+  #btnOpenAdmin {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    padding: 10px 14px;
+    font-size: 12px;
+    border-radius: 6px;
+    z-index: 999;
+  }
+
+  /* ===== MODAL OVERLAY ON MOBILE ===== */
+  #modal-overlay {
+    z-index: 998;
+  }
+}
+
+/* EXTRA SMALL - dưới 480px (phones nhỏ) */
+@media (max-width: 479px) {
+  body {
+    font-size: 13px;
+  }
+
+  #login-form {
+    margin: 30px 10px;
+    padding: 20px;
+  }
+
+  #login-form h3 {
+    font-size: 20px;
+    margin-bottom: 18px;
+  }
+
+  #login-form input {
+    padding: 11px 12px;
+    margin-bottom: 11px;
+    font-size: 15px;
+  }
+
+  #btnLogin {
+    padding: 11px;
+    font-size: 13px;
+  }
+
+  #admin-panel {
+    max-width: 92%;
+    padding: 20px;
+    width: 92%;
+  }
+
+  #admin-panel h3 {
+    font-size: 17px;
+    margin-bottom: 15px;
+  }
+
+  #admin-panel input[type="file"],
+  #admin-panel input[type="text"] {
+    padding: 10px 11px;
+    margin-bottom: 10px;
+    font-size: 15px;
+  }
+
+  #btnUpload {
+    padding: 10px;
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  #btnLogout {
+    padding: 10px !important;
+    font-size: 12px !important;
+  }
+
+  #gallery-title {
+    font-size: 20px;
+    margin-top: 25px;
+    margin-bottom: 12px;
+    padding: 0 10px;
+  }
+
+  #gallery {
+    padding: 10px;
+    gap: 10px;
+    margin: 15px auto;
+  }
+
+  #gallery > div {
+    flex: 0 1 calc(50% - 15px);
+  }
+
+  #gallery img {
+    width: 100% !important;
+    height: 160px !important;
+  }
+
+  #gallery p {
+    padding: 8px;
+    font-size: 11px;
+    min-height: 32px;
+  }
+
+  .btn-delete {
+    width: calc(100% - 6px) !important;
+    margin: 0 3px 5px 3px !important;
+    padding: 7px !important;
+    font-size: 10px;
+  }
+
+  #btnOpenAdmin {
+    top: 10px;
+    right: 10px;
+    padding: 9px 12px;
+    font-size: 11px;
+  }
+}

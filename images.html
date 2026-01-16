@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <title>All Images - Portfolio</title>
+    <style>
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(154, 123, 79, 0.2);
+            border-top-color: #9a7b4f;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="nav-content">
+            <div class="brand">
+                <!-- <h1>TRINH PHUONG</h1> -->
+                                 <h1>  <a href="index.html" style="text-decoration: none; color: inherit;">TRINH PHUONG</a></h1>
+
+            </div>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="images.html">All Images</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Gallery Section -->
+    <section class="tattoo-works" style="padding-top: 120px;">
+        <div class="section-content">
+            <h2 class="section-title">All Images</h2>
+            <p class="section-subtitle">Complete collection from my projects</p>
+            
+            <div id="gallery" class="gallery-grid">
+                <!-- Images will be loaded here -->
+            </div>
+
+            <div id="loading-indicator" style="text-align: center; padding: 40px; display: none;">
+                <div style="display: inline-block;">
+                    <div class="spinner"></div>
+                    <p style="color: #9a7b4f; font-size: 16px; margin-top: 15px; font-style: italic;">Loading...</p>
+                </div>
+            </div>
+
+            <div id="no-images" style="text-align: center; padding: 40px; color: #888; font-size: 16px; display: none;">
+                <p>No images</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>TRINH PHUONG</h3>
+                <p>Independent Artist</p>
+            </div>
+            <div class="footer-copyright">
+                <p>&copy; 2026. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot } 
+            from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyADHfTbhzGsZR6r6xkYrGC20NkXYYOAmbk",
+            authDomain: "my-portfolio-web-9b21b.firebaseapp.com",
+            projectId: "my-portfolio-web-9b21b",
+            storageBucket: "my-portfolio-web-9b21b.firebasestorage.app",
+            messagingSenderId: "474695357807",
+            appId: "1:474695357807:web:7fb0dfc1278ed8038fc49a",
+            measurementId: "G-YR4CZKGJEN"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Infinite Scroll Variables
+        let allImages = [];
+        let displayedCount = 5;
+        const ITEMS_PER_LOAD = 5;
+        let isLoading = false;
+
+        // Get all images from Firestore
+        const q = query(collection(db, "portfolio_images"), orderBy("createdAt", "desc"));
+        
+        onSnapshot(q, (snapshot) => {
+            allImages = [];
+            snapshot.forEach((docSnap) => {
+                allImages.push({
+                    id: docSnap.id,
+                    data: docSnap.data()
+                });
+            });
+            
+            displayedCount = 5;
+            renderGallery();
+        });
+
+        // Render Gallery
+        function renderGallery() {
+            const gallery = document.getElementById('gallery');
+            const noImages = document.getElementById('no-images');
+            
+            if (allImages.length === 0) {
+                gallery.innerHTML = "";
+                noImages.style.display = 'block';
+                return;
+            }
+
+            noImages.style.display = 'none';
+
+            if (displayedCount === 5 || displayedCount - ITEMS_PER_LOAD === 0) {
+                gallery.innerHTML = "";
+            }
+
+            const imagesToDisplay = allImages.slice(0, displayedCount);
+            
+            if (displayedCount === 5) {
+                gallery.innerHTML = "";
+                imagesToDisplay.forEach(item => {
+                    const { id, data } = item;
+                    const div = document.createElement('div');
+                    div.className = 'gallery-item';
+                    div.innerHTML = `
+                        <div class="gallery-image">
+                            <img src="${data.imageUrl}" alt="${data.caption}">
+                            <div class="gallery-overlay"></div>
+                            <div class="gallery-info">
+                                <h3>${data.caption || 'Untitled Work'}</h3>
+                                <p class="description" style="font-size: 14px; margin-top: 0.5rem;">From my collection</p>
+                            </div>
+                        </div>
+                    `;
+                    gallery.appendChild(div);
+                });
+            } else {
+                const newImages = allImages.slice(displayedCount - ITEMS_PER_LOAD, displayedCount);
+                newImages.forEach(item => {
+                    const { id, data } = item;
+                    const div = document.createElement('div');
+                    div.className = 'gallery-item';
+                    div.innerHTML = `
+                        <div class="gallery-image">
+                            <img src="${data.imageUrl}" alt="${data.caption}">
+                            <div class="gallery-overlay"></div>
+                            <div class="gallery-info">
+                                <h3>${data.caption || 'Untitled Work'}</h3>
+                                <p class="description" style="font-size: 14px; margin-top: 0.5rem;">From my collection</p>
+                            </div>
+                        </div>
+                    `;
+                    gallery.appendChild(div);
+                });
+            }
+
+            isLoading = false;
+        }
+
+        // Infinite Scroll Listener
+        window.addEventListener('scroll', () => {
+            if (isLoading || displayedCount >= allImages.length) return;
+
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+                isLoading = true;
+                displayedCount += ITEMS_PER_LOAD;
+                
+                document.getElementById('loading-indicator').style.display = 'block';
+                
+                setTimeout(() => {
+                    renderGallery();
+                    document.getElementById('loading-indicator').style.display = 'none';
+                }, 300);
+            }
+        });
+    </script>
+</body>
+</html>
