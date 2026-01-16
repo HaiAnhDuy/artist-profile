@@ -1,5 +1,5 @@
 # Environment Variables
-config.js
+# config.js
 .env
 .env.local
 .env.*.local
